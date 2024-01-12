@@ -1,14 +1,21 @@
 const express = require('express');
 const app = express();
 const jwt = require('jsonwebtoken');
+const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 require('dotenv').config()
 const port = process.env.PORT || 5000;
 
 // middleware
-app.use(cors());
+app.use(cors({
+  origin: [
+    'http://localhost:5173',
+  ],
+  credentials:true
+}));
 app.use(express.json());
+app.use(cookieParser())
 
 console.log(process.env.DB_USER);
 
@@ -31,7 +38,10 @@ async function run() {
     const menuCollection = client.db("serviceFact").collection("menu");
     const reviewsCollection = client.db("serviceFact").collection("reviews");
     const cartCollection = client.db("serviceFact").collection("cart");
+    
 
+
+//  menu related
     app.get('/menu', async (req, res) => {
       const result = await menuCollection.find().toArray();
       res.send(result);
@@ -54,7 +64,13 @@ app.post('/jwt', async(req, res)=>{
   const user = req.body;
   console.log(user);
   const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {expiresIn: '1h'})
-  res.send(token);
+
+  res.cookie('token', token,{
+    httpOnly: true,
+    secure: false,
+    sameSite: 'none'
+  })
+  res.send({success: true});
 })
 
 
