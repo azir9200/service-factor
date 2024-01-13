@@ -37,7 +37,8 @@ async function run() {
 
     const menuCollection = client.db("serviceFact").collection("menu");
     const reviewsCollection = client.db("serviceFact").collection("reviews");
-    const cartCollection = client.db("serviceFact").collection("cart");
+    const cartCollection = client.db("serviceFact").collection("cart");    
+    const userCollection = client.db("serviceFact").collection("user");
     
 
 
@@ -73,6 +74,12 @@ app.post('/jwt', async(req, res)=>{
   res.send({success: true});
 })
 
+// users related api...
+app.post('/user', async (req, res) => {
+  const user = req.body;
+  const result = await userCollection.insertOne(user);
+  res.send(result);
+})
 
     // cart related api
     app.get('/cart', async (req, res) => {
